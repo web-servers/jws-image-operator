@@ -47,6 +47,10 @@ spec:
               type: string
             imageStreamName:
               type: string
+            jwsAdminPassword:
+              type: string
+            jwsAdminUsername:
+              type: string
             mavenMirrorUrl:
               type: string
             replicas:

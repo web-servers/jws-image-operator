@@ -410,6 +410,12 @@ func (r *ReconcileJBossWebServer) deploymentConfigForJBossWebServer(t *jwsserver
 						Env: []corev1.EnvVar{{
 							Name:		"KUBERNETES_NAMESPACE",
 							Value:		"jbosswebserver",
+						}, {
+							Name:  "JWS_ADMIN_USERNAME",
+							Value: t.Spec.JwsAdminUsername,
+						}, {
+							Name:  "JWS_ADMIN_PASSWORD",
+							Value: t.Spec.JwsAdminPassword,
 						}},
 					}},
 				},
@@ -475,6 +481,12 @@ func (r *ReconcileJBossWebServer) deploymentForJBossWebServer(t *jwsserversv1alp
 						Env: []corev1.EnvVar{{
 							Name:		"KUBERNETES_NAMESPACE",
 							Value:		"jbosswebserver",
+						}, {
+							Name:  "JWS_ADMIN_USERNAME",
+							Value: t.Spec.JwsAdminUsername,
+						}, {
+							Name:  "JWS_ADMIN_PASSWORD",
+							Value: t.Spec.JwsAdminPassword,
 						}},
 					}},
 				},
@@ -614,13 +626,22 @@ func (r *ReconcileJBossWebServer) buildConfigForJBossWebServer(t *jwsserversv1al
 func createLivenessProbe() *corev1.Probe {
 	livenessProbeScript, defined := os.LookupEnv("SERVER_LIVENESS_SCRIPT")
 	if defined {
-		return &corev1.Probe{
-			Handler: corev1.Handler{
-				Exec: &corev1.ExecAction{
-					Command: strings.Split(livenessProbeScript, " "),
+		if livenessProbeScript[1] != '/' {
+			return &corev1.Probe{
+				Handler: corev1.Handler{
+					Exec: &corev1.ExecAction{
+						Command: []string{"/bin/bash", "-c", livenessProbeScript},
+					},
 				},
-			},
-			InitialDelaySeconds: 60,
+			}
+		} else {
+			return &corev1.Probe{
+				Handler: corev1.Handler{
+					Exec: &corev1.ExecAction{
+						Command: strings.Split(livenessProbeScript, " "),
+					},
+				},
+			}
 		}
 	}
 	return nil
@@ -634,12 +655,22 @@ func createLivenessProbe() *corev1.Probe {
 func createReadinessProbe() *corev1.Probe {
 	readinessProbeScript, defined := os.LookupEnv("SERVER_READINESS_SCRIPT")
 	if defined {
-		return &corev1.Probe{
-			Handler: corev1.Handler{
-				Exec: &corev1.ExecAction{
-					Command: strings.Split(readinessProbeScript, " "),
+		if readinessProbeScript[1] != '/' {
+			return &corev1.Probe{
+				Handler: corev1.Handler{
+					Exec: &corev1.ExecAction{
+						Command: []string{"/bin/bash", "-c", readinessProbeScript},
+					},
 				},
-			},
+			}
+		} else {
+			return &corev1.Probe{
+				Handler: corev1.Handler{
+					Exec: &corev1.ExecAction{
+						Command: strings.Split(readinessProbeScript, " "),
+					},
+				},
+			}
 		}
 	} else {
 		/* Use the default one */
