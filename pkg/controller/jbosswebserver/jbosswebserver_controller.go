@@ -2,7 +2,6 @@ package jbosswebserver
 
 import (
 	"context"
-	"os"
 	"strings"
 
 	"k8s.io/apimachinery/pkg/util/intstr"
@@ -396,8 +395,8 @@ func (r *ReconcileJBossWebServer) deploymentConfigForJBossWebServer(t *jwsserver
 						Name:            t.Spec.ApplicationName,
 						Image:           t.Spec.ApplicationName,
 						ImagePullPolicy: "Always",
-						ReadinessProbe:  createReadinessProbe(),
-						LivenessProbe:   createLivenessProbe(),
+						ReadinessProbe:  createReadinessProbe(t),
+						LivenessProbe:   createLivenessProbe(t),
 						Ports: []corev1.ContainerPort{{
 							Name:          "jolokia",
 							ContainerPort: 8778,
@@ -467,8 +466,8 @@ func (r *ReconcileJBossWebServer) deploymentForJBossWebServer(t *jwsserversv1alp
 						Name:            t.Spec.ApplicationName,
 						Image:           t.Spec.ApplicationImage,
 						ImagePullPolicy: "Always",
-						ReadinessProbe:  createReadinessProbe(),
-						LivenessProbe:   createLivenessProbe(),
+						ReadinessProbe:  createReadinessProbe(t),
+						LivenessProbe:   createLivenessProbe(t),
 						Ports: []corev1.ContainerPort{{
 							Name:          "jolokia",
 							ContainerPort: 8778,
@@ -623,9 +622,9 @@ func (r *ReconcileJBossWebServer) buildConfigForJBossWebServer(t *jwsserversv1al
 //
 // If defined, the SERVER_LIVENESS_SCRIPT env var must be the path of a shell script that
 // complies to the Kubernetes probes requirements.
-func createLivenessProbe() *corev1.Probe {
-	livenessProbeScript, defined := os.LookupEnv("SERVER_LIVENESS_SCRIPT")
-	if defined {
+func createLivenessProbe(t *jwsserversv1alpha1.JBossWebServer) *corev1.Probe {
+	livenessProbeScript := t.Spec.ServerLivenessScript
+	if livenessProbeScript != "" {
 		if livenessProbeScript[1] != '/' {
 			return &corev1.Probe{
 				Handler: corev1.Handler{
@@ -652,9 +651,9 @@ func createLivenessProbe() *corev1.Probe {
 //
 // If defined, the SERVER_READINESS_SCRIPT env var must be the path of a shell script that
 // complies to the Kuberenetes probes requirements.
-func createReadinessProbe() *corev1.Probe {
-	readinessProbeScript, defined := os.LookupEnv("SERVER_READINESS_SCRIPT")
-	if defined {
+func createReadinessProbe(t *jwsserversv1alpha1.JBossWebServer) *corev1.Probe {
+	readinessProbeScript := t.Spec.ServerReadnessScript
+	if readinessProbeScript != "" {
 		if readinessProbeScript[1] != '/' {
 			return &corev1.Probe{
 				Handler: corev1.Handler{

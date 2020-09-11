@@ -51,6 +51,11 @@ spec:
               type: string
             jwsAdminUsername:
               type: string
+            serverReadnessScript:
+              type: string
+            ServerLivenessScript:
+              type: string
+            ServerLivenessScript:
             mavenMirrorUrl:
               type: string
             replicas:

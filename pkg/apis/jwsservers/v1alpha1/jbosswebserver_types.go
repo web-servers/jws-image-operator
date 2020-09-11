@@ -22,6 +22,9 @@ type JBossWebServerSpec struct {
 	// Username and Password are for pre 5.4 images
 	JwsAdminUsername     string `json:"jwsAdminUsername"`
 	JwsAdminPassword     string `json:"jwsAdminPassword"`
+	// Corresponding Strings from the health check logics
+	ServerReadnessScript string `json:"serverReadnessScript"`
+	ServerLivenessScript string `json:"serverLivenessScript"`
 	GithubWebhookSecret  string `json:"githubWebhookSecret"`
 	GenericWebhookSecret string `json:"genericWebhookSecret"`
 	ImageStreamNamespace string `json:"imageStreamNamespace"`
