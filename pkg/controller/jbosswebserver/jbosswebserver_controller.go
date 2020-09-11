@@ -625,7 +625,7 @@ func (r *ReconcileJBossWebServer) buildConfigForJBossWebServer(t *jwsserversv1al
 func createLivenessProbe(t *jwsserversv1alpha1.JBossWebServer) *corev1.Probe {
 	livenessProbeScript := t.Spec.ServerLivenessScript
 	if livenessProbeScript != "" {
-		if livenessProbeScript[1] != '/' {
+		if livenessProbeScript[0] != '/' {
 			return &corev1.Probe{
 				Handler: corev1.Handler{
 					Exec: &corev1.ExecAction{
@@ -654,7 +654,7 @@ func createLivenessProbe(t *jwsserversv1alpha1.JBossWebServer) *corev1.Probe {
 func createReadinessProbe(t *jwsserversv1alpha1.JBossWebServer) *corev1.Probe {
 	readinessProbeScript := t.Spec.ServerReadnessScript
 	if readinessProbeScript != "" {
-		if readinessProbeScript[1] != '/' {
+		if readinessProbeScript[0] != '/' {
 			return &corev1.Probe{
 				Handler: corev1.Handler{
 					Exec: &corev1.ExecAction{
